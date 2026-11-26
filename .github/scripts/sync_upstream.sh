@@ -4,7 +4,7 @@ set -euo pipefail
 
 git config user.name 'github-actions[bot]'
 git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-git fetch --no-tags https://github.com/xmrig/xmrig.git refs/heads/master
+git fetch --no-tags https://github.com/MoneroOcean/xmrig.git refs/heads/master
 upstream_sha=$(git rev-parse FETCH_HEAD)
 orig_sha=$(git rev-parse HEAD)
 git merge --no-edit "$upstream_sha"
@@ -21,9 +21,9 @@ if ! git diff --cached --quiet; then
     git commit -m 'Set default and minimum donation levels to zero'
 fi
 # A regular push fails safely if the branch moved or branch protection blocks updates.
-git push origin "HEAD:refs/heads/$DEFAULT_BRANCH"
+git push origin "HEAD:refs/heads/$SYNC_BRANCH"
 source_sha=$(git rev-parse HEAD)
-tag="build-${upstream_sha:0:12}-${source_sha:0:12}"
+tag="moneroocean-build-${upstream_sha:0:12}-${source_sha:0:12}"
 
 # Inspect all releases, including drafts; API/network failures must not look like a missing release.
 releases=$(gh api --paginate "repos/$GITHUB_REPOSITORY/releases?per_page=100" --jq '.[] | {tag_name, draft, assets: [.assets[].name]}')
