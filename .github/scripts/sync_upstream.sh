@@ -6,7 +6,15 @@ git config user.name 'github-actions[bot]'
 git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 git fetch --no-tags https://github.com/xmrig/xmrig.git refs/heads/master
 upstream_sha=$(git rev-parse FETCH_HEAD)
+orig_sha=$(git rev-parse HEAD)
 git merge --no-edit "$upstream_sha"
+# GITHUB_TOKEN cannot push workflow file changes (no `workflows` permission), so keep the
+# fork's own workflows and ignore any upstream additions/edits under .github/workflows.
+git rm -rfq --ignore-unmatch -- .github/workflows
+git checkout "$orig_sha" -- .github/workflows
+if ! git diff --cached --quiet; then
+    git commit -m 'Keep fork workflows; skip upstream workflow changes'
+fi
 python3 .github/scripts/zero_donation.py
 git add src/donate.h src/config.json src/core/config/Config_default.h src/core/config/usage.h
 if ! git diff --cached --quiet; then
